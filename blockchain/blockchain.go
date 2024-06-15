@@ -1,11 +1,8 @@
-package main
+package blockchain
 
 import (
-	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 )
 
 const (
@@ -13,53 +10,6 @@ const (
 	MINING_SENDER     = "BLOCKCHAIN REWARD SYSTEM (e.g. minting & fees)"
 	MINING_REWARD     = 1.0
 )
-
-type Block struct {
-	nonce        int
-	previousHash [32]byte
-	timestamp    int64
-	transactions []*Transaction
-}
-
-func NewBlock(nonce int, previousHash [32]byte, transactions []*Transaction) *Block {
-	b := &Block{
-		timestamp:    time.Now().UnixNano(),
-		nonce:        nonce,
-		previousHash: previousHash,
-		transactions: transactions,
-	}
-
-	return b
-}
-
-func (b *Block) Print() {
-	fmt.Printf("timestamp\t%d\n", b.timestamp)
-	fmt.Printf("nonce\t\t%d\n", b.nonce)
-	fmt.Printf("previous_hash\t%x\n", b.previousHash)
-	for _, t := range b.transactions {
-		t.Print()
-	}
-}
-
-func (b *Block) Hash() [32]byte {
-	m, _ := json.Marshal(b)
-	// fmt.Println(string(m))
-	return sha256.Sum256([]byte(m))
-}
-
-func (b *Block) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Nonce        int            `json:"nonce"`
-		previousHash [32]byte       `json:"previous_hash"`
-		Timestamp    int64          `json:"timestamp"`
-		Transactions []*Transaction `json:"transactions"`
-	}{
-		Nonce:        b.nonce,
-		previousHash: b.previousHash,
-		Timestamp:    b.timestamp,
-		Transactions: b.transactions,
-	})
-}
 
 type Blockchain struct {
 	transactionPool   []*Transaction
@@ -154,52 +104,4 @@ func (bc *Blockchain) CalculateTotalAmount(blockchainAddr string) float32 {
 	}
 
 	return totalAmount
-}
-
-type Transaction struct {
-	senderBlockchainAddress    string
-	recipientBlockchainAddress string
-	value                      float32
-}
-
-func NewTransaction(sender string, recipient string, value float32) *Transaction {
-	return &Transaction{sender, recipient, value}
-}
-
-func (t *Transaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		SenderBlockchainAddress    string  `json:"sender_blockchain_address"`
-		RecipientBlockchainAddress string  `json:"recipient_blockchain_address"`
-		Value                      float32 `json:"value"`
-	}{
-		SenderBlockchainAddress:    t.senderBlockchainAddress,
-		RecipientBlockchainAddress: t.recipientBlockchainAddress,
-		Value:                      t.value,
-	})
-}
-
-func (t *Transaction) Print() {
-	fmt.Printf("%s\n", strings.Repeat("-", 40))
-	fmt.Printf("  sender_blockchain_address\t%s\n", t.senderBlockchainAddress)
-	fmt.Printf("  recipient_blockchain_address\t%s\n", t.recipientBlockchainAddress)
-	fmt.Printf("  value\t\t\t\t%1f\n", t.value)
-}
-
-func main() {
-	minerBlockchainAddr := "miners_blockchain_addr"
-	bc := NewBlockchain(minerBlockchainAddr)
-	bc.Print()
-
-	bc.AddTransaction("Rock", "Morty", 137)
-	bc.Mining()
-	bc.Print()
-
-	bc.AddTransaction("Stan", "Francine", 23)
-	bc.AddTransaction("Fry", "Ben", 42)
-	bc.Mining()
-	bc.Print()
-
-	fmt.Printf("Miner %.1f\n", bc.CalculateTotalAmount(minerBlockchainAddr))
-	fmt.Printf("Stan %.1f\n", bc.CalculateTotalAmount("Stan"))
-	fmt.Printf("Francine %.1f\n", bc.CalculateTotalAmount("Francine"))
 }
