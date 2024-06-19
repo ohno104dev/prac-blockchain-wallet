@@ -57,6 +57,14 @@ func NewWallet() *Wallet {
 	return w
 }
 
+func (w *Wallet) PrivateKey() *ecdsa.PrivateKey {
+	return w.privateKey
+}
+
+func (w *Wallet) PublicKey() *ecdsa.PublicKey {
+	return w.publicKey
+}
+
 func (w *Wallet) BlockchainAddress() string {
 	return w.blockchainAddress
 }

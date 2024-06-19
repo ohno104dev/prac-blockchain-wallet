@@ -18,13 +18,13 @@ func NewTransaction(sender string, recipient string, value float32) *Transaction
 
 func (t *Transaction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		SenderBlockchainAddress    string  `json:"sender_blockchain_address"`
-		RecipientBlockchainAddress string  `json:"recipient_blockchain_address"`
-		Value                      float32 `json:"value"`
+		Sender    string  `json:"sender_blockchain_address"`
+		Recipient string  `json:"recipient_blockchain_address"`
+		Value     float32 `json:"value"`
 	}{
-		SenderBlockchainAddress:    t.senderBlockchainAddress,
-		RecipientBlockchainAddress: t.recipientBlockchainAddress,
-		Value:                      t.value,
+		Sender:    t.senderBlockchainAddress,
+		Recipient: t.recipientBlockchainAddress,
+		Value:     t.value,
 	})
 }
 
