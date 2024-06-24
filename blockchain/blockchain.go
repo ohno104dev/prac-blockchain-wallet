@@ -1,8 +1,14 @@
 package blockchain
 
 import (
+	"crypto/ecdsa"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
+
+	"github.com/ohno104dev/prac-blockchain-wallet-go/utils"
 )
 
 const (
@@ -45,7 +51,7 @@ func (bc *Blockchain) LastBlock() *Block {
 }
 
 func (bc *Blockchain) Mining() bool {
-	bc.AddTransaction(MINING_SENDER, bc.BlockchainAddress, MINING_REWARD)
+	bc.AddTransaction(MINING_SENDER, bc.BlockchainAddress, MINING_REWARD, nil, nil)
 	nonce := bc.ProofOfWork()
 	previousHash := bc.LastBlock().Hash()
 	bc.CreateBlock(nonce, previousHash)
@@ -53,10 +59,35 @@ func (bc *Blockchain) Mining() bool {
 	return true
 }
 
-func (bc *Blockchain) AddTransaction(sender string, recipient string, value float32) bool {
+func (bc *Blockchain) AddTransaction(sender string, recipient string, value float32, senderPublicKey *ecdsa.PublicKey, s *utils.Signature) bool {
 	t := NewTransaction(sender, recipient, value)
-	bc.transactionPool = append(bc.transactionPool, t)
+
+	if sender == MINING_SENDER {
+		bc.transactionPool = append(bc.transactionPool, t)
+		return true
+	}
+
+	if bc.VerifyTransactionSignature(senderPublicKey, s, t) {
+		// XXX: For easy test
+		// if bc.CalculateTotalAmount(sender) < value {
+		// 	log.Println("ERROR: not enough balance in wallet")
+		// 	return false
+		// }
+
+		bc.transactionPool = append(bc.transactionPool, t)
+		return true
+	} else {
+		log.Println("ERROR: Could not verify transaction")
+	}
+
 	return false
+}
+
+func (bc *Blockchain) VerifyTransactionSignature(senderPublicKey *ecdsa.PublicKey, s *utils.Signature, t *Transaction) bool {
+	m, _ := json.Marshal(t)
+	h := sha256.Sum256([]byte(m))
+
+	return ecdsa.Verify(senderPublicKey, h[:], s.R, s.S)
 }
 
 func (bc *Blockchain) CopyTransactionPool() []*Transaction {
