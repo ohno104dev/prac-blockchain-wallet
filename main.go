@@ -19,6 +19,8 @@ func main() {
 	blockchain := blockchain.NewBlockchain(wMiner.BlockchainAddress())
 	isAdded := blockchain.AddTransaction(wAlice.BlockchainAddress(), wBob.BlockchainAddress(), 23.0, wAlice.PublicKey(), t.GenerateSignature())
 
+	fmt.Println("Transaction add to transaction pool?", isAdded)
+
 	blockchain.Mining()
 	blockchain.Print()
 
