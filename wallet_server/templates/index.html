@@ -3,6 +3,23 @@
 <head>
 	<title>Wallet</title>
 	<script src="https://ajax.microsoft.com/ajax/jquery/jquery-3.7.1.min.js"></script>
+	<script>
+		$(function() {
+			$.ajax({
+				url:'/wallet',
+				type:'POST',
+				success: function (response) {
+					$('#public_key').val(response['public_key']);
+					$('#private_key').val(response['private_key']);
+					$('#blockchain_address').val(response['blockchain_address']);
+					console.info(response)
+				},
+				error:function(error){
+					console.error(error)
+				}
+			})
+		})
+	</script>
 </head>
 <body style="background-color: darkslategrey; color: beige;">
 	<div>
@@ -15,7 +32,7 @@
 		<p>Private Key</p>
 		<textarea id="private_key" rows="1" cols="63"></textarea>
 		<p>Blockchain Address</p>
-		<textarea id="blockchain_key" rows="1" cols="63"></textarea>
+		<textarea id="blockchain_address" rows="1" cols="63"></textarea>
 	</div>
 
 	<div>
@@ -25,7 +42,7 @@
 				Address <input id="recipient_blockchain_address" size="48" type="text">
 			</p>
 			<p>
-				Amount <input id="recipient_blockchain_address" size="5" type="text">
+				Amount <input id="recipient_blockchain_amount" size="5" type="text">
 				<button id="send_money_button">Send</button>
 			</p>
 		</div>
