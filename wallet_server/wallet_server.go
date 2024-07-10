@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/ohno104dev/prac-blockchain-wallet-go/utils"
 	"github.com/ohno104dev/prac-blockchain-wallet-go/wallet"
 )
 
@@ -53,8 +54,20 @@ func (ws *WalletServer) Wallet(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (ws *WalletServer) CreateTransaction(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, string(utils.JsonStatus("Wubba Lubba Dub Dub")))
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("ERROR: Invalid HTTP method")
+	}
+}
+
 func (ws *WalletServer) Run() {
 	http.HandleFunc("/", ws.Index)
 	http.HandleFunc("/wallet", ws.Wallet)
+	http.HandleFunc("/transaction", ws.CreateTransaction)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+strconv.Itoa(int(ws.port)), nil))
 }
