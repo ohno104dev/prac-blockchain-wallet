@@ -71,11 +71,11 @@ func (w *Wallet) BlockchainAddress() string {
 }
 
 func (w *Wallet) PrivateKeyStr() string {
-	return fmt.Sprintf("%x", w.privateKey.D.Bytes())
+	return fmt.Sprintf("%064x", w.privateKey.D.Bytes())
 }
 
 func (w *Wallet) PublicKeyStr() string {
-	return fmt.Sprintf("%x%x", w.privateKey.X.Bytes(), w.publicKey.Y.Bytes())
+	return fmt.Sprintf("%064x%064x", w.privateKey.X.Bytes(), w.publicKey.Y.Bytes())
 }
 
 func (w *Wallet) MarshalJSON() ([]byte, error) {
