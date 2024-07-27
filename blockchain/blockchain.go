@@ -174,3 +174,15 @@ func (bc *Blockchain) CalculateTotalAmount(blockchainAddr string) float32 {
 
 	return totalAmount
 }
+
+type AmountResponse struct {
+	Amount float32 `json:"amount"`
+}
+
+func (ar *AmountResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Amount float32 `json:"amount"`
+	}{
+		ar.Amount,
+	})
+}

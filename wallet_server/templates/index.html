@@ -54,14 +54,43 @@
 					}
 				})
 			})
-		})
+
+			function reload_amount() {
+				let data = {'blockchain_address': $('#blockchain_address').val()}
+				$.ajax({
+					url: '/wallet/amount',
+					type: 'GET',
+					data: data,
+					success: function (response) {
+						console.info(response);
+						let amount = response['amount'];
+						
+						$('#wallet_amount').text(amount);
+						console.info(amount);
+					},
+					error: function(error) {
+						console.error(error);
+					}
+				})
+			}
+
+			/*
+			$('#reload_wallet').click(function(){
+				reload_amount();
+			});
+			*/
+
+			setInterval(reload_amount,3000)
+		});
 	</script>
 </head>
 <body style="background-color: darkslategrey; color: beige;">
 	<div>
 		<h3>Wallet</h3>
 		<span style="font-size: large;" id="wallet_amount">0</span>
+		<!--
 		<button id="reload_wallet">Reload</button>
+		-->
 
 		<p>Public Key</p>
 		<textarea id="public_key" rows="2" cols="63"></textarea>
