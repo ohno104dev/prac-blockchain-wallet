@@ -18,3 +18,14 @@ func main() {
 	log.Println("Starting wallet server on port:", *port, "using blockchain node", *gateway, "as gateway")
 	app.Run()
 }
+
+type A struct {
+}
+
+func (A) Hello() {}
+
+type IA interface {
+	Hello()
+}
+
+var _ IA = (*A)(nil)

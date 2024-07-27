@@ -108,9 +108,48 @@ func (bcn *BlockchainNode) Transactions(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func (bcn *BlockchainNode) Mine(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		bc := bcn.GetBlockchain()
+		isMine := bc.Mining()
+
+		var m []byte
+		if !isMine {
+			w.WriteHeader(http.StatusBadRequest)
+			m = utils.JsonStatus("fail")
+		} else {
+			m = utils.JsonStatus("success")
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		io.WriteString(w, string(m))
+	default:
+		log.Println("ERROR: Invalid HTTP method")
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
+func (bcn *BlockchainNode) StartMining(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		bc := bcn.GetBlockchain()
+		bc.StartMining()
+
+		m := utils.JsonStatus("success")
+		w.Header().Add("Content-Type", "application/json")
+		io.WriteString(w, string(m))
+	default:
+		log.Println("ERROR: Invalid HTTP method")
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
 func (bcn *BlockchainNode) Run() {
 	http.HandleFunc("/", bcn.GetChain)
 	http.HandleFunc("/transactions", bcn.Transactions)
+	http.HandleFunc("/mine", bcn.Mine)
+	http.HandleFunc("/mine/start", bcn.StartMining)
 
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+strconv.Itoa(int(bcn.port)), nil))
 }
