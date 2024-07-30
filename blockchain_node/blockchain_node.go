@@ -163,6 +163,8 @@ func (bcn *BlockchainNode) Amount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (bcn *BlockchainNode) Run() {
+	bcn.GetBlockchain().Run()
+
 	http.HandleFunc("/", bcn.GetChain)
 	http.HandleFunc("/transactions", bcn.Transactions)
 	http.HandleFunc("/mine", bcn.Mine)

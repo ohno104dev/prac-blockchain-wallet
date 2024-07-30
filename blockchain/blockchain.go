@@ -18,6 +18,12 @@ const (
 	MINING_SENDER     = "BLOCKCHAIN REWARD SYSTEM (e.g. minting & fees)"
 	MINING_REWARD     = 1.0
 	MINING_TIMER_SEC  = 20
+
+	BLOCKCHAIN_PORT_RANGE_START       = 3333
+	BLOCKCHAIN_PROT_RANGE_END         = 3336
+	NEIGHBOR_IP_RANGE_START           = 0
+	NEIGHBOR_IP_RANGE_END             = 3
+	BLOCKCHAIN_NEIGHBOR_SYNC_TIME_SEC = 10
 )
 
 type Blockchain struct {
@@ -26,6 +32,9 @@ type Blockchain struct {
 	BlockchainAddress string
 	port              uint16
 	mux               sync.Mutex
+
+	neighbors    []string
+	muxNeighbors sync.Mutex
 }
 
 func NewBlockchain(addr string, port uint16) *Blockchain {
@@ -36,6 +45,30 @@ func NewBlockchain(addr string, port uint16) *Blockchain {
 	bc.port = port
 
 	return bc
+}
+
+func (bc *Blockchain) Run() {
+	bc.StartSyncNeighbors()
+}
+
+func (bc *Blockchain) SetNeighbors() {
+	bc.neighbors = utils.FindNeighbors(utils.GetHost(), bc.port, NEIGHBOR_IP_RANGE_START, NEIGHBOR_IP_RANGE_END, BLOCKCHAIN_PORT_RANGE_START, BLOCKCHAIN_PROT_RANGE_END)
+	if len(bc.neighbors) > 0 {
+		log.Printf("This node's neighbors are %v", bc.neighbors)
+	} else {
+		log.Printf("This node could not find neighbors.")
+	}
+}
+
+func (bc *Blockchain) SyncNeighbors() {
+	bc.muxNeighbors.Lock()
+	defer bc.muxNeighbors.Unlock()
+	bc.SetNeighbors()
+}
+
+func (bc *Blockchain) StartSyncNeighbors() {
+	bc.SyncNeighbors()
+	_ = time.AfterFunc(time.Second*BLOCKCHAIN_NEIGHBOR_SYNC_TIME_SEC, bc.StartSyncNeighbors)
 }
 
 func (bc *Blockchain) TransactionPool() []*Transaction {
