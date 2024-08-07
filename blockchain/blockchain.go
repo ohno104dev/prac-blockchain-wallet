@@ -50,20 +50,13 @@ func NewBlockchain(addr string, port uint16) *Blockchain {
 }
 
 func (bc *Blockchain) Chain() []*Block {
-	for i, c := range bc.chain {
-		log.Printf("@@@@@@@@@@[%v]: nonce[%v]\n", i, c.nonce)
-		log.Printf("@@@@@@@@@@[%v]: previousHash[%v]\n", i, c.previousHash)
-		log.Printf("@@@@@@@@@@[%v]: timestamp[%v]\n", i, c.timestamp)
-		log.Printf("@@@@@@@@@@[%v]: transactions[%v]\n", i, c.transactions)
-	}
-
 	return bc.chain
 }
 
 func (bc *Blockchain) Run() {
 	bc.StartSyncNeighbors()
 	bc.ResolveConflicts()
-	// bc.StartMining()
+	bc.StartMining()
 }
 
 func (bc *Blockchain) SetNeighbors() {
@@ -325,7 +318,7 @@ func (bc *Blockchain) ResolveConflicts() bool {
 			}
 		}
 	}
-	log.Println("====================AFTER==================longestChain: ", longestChain)
+
 	if longestChain != nil {
 		bc.chain = longestChain
 		log.Printf("Resolved conflicts: blockchain was replaced")

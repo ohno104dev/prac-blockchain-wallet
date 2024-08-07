@@ -47,7 +47,6 @@ func (bcn *BlockchainNode) GetChain(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		bc := bcn.GetBlockchain()
 		m, _ := bc.MarshalJSON()
-		log.Println("========bc:", bc)
 		io.WriteString(w, string(m[:]))
 	default:
 		log.Printf("Error: Invalid HTTP method")
