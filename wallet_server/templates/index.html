@@ -62,9 +62,7 @@
 					type: 'GET',
 					data: data,
 					success: function (response) {
-						console.info(response);
 						let amount = response['amount'];
-						
 						$('#wallet_amount').text(amount);
 						console.info(amount);
 					},
